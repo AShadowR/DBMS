@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup - Carpooling Website</title>
+    <link rel="stylesheet" href="../static/signupstyle.css">
+    <style>
+        /* Add your CSS here if needed */
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav>
+        <div class="logo">Carpool Buddy</div>
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Signup Form Section -->
+    <div class="container">
+        <div class="switch-container">
+            <button onclick="toggleForm('rider')">Rider</button>
+            <button onclick="toggleForm('driver')">Driver</button>
+        </div>
+
+        <div id="riderForm" class="signup-form">
+            <h2>rider Signup</h2>
+            <form onsubmit="handleSignup(event, 'rider')" method="post">
+                <label for="rider-name">Name</label>
+                <input type="text" id="rider-name" name="name" required>
+            
+                <label for="rider-email">Email</label>
+                <input type="email" id="rider-email" name="email" required>
+            
+                <label for="rider-phonenumber">phonenumber</label>
+                <input type="text" id="rider-phonenumber" name="phonenumber" required>
+
+                <label for="rider-password">Password</label>
+                <input type="password" id="rider-password" name="password" required>
+            
+                <button type="submit">Sign Up</button>
+            </form>            
+        </div>
+
+        <div id="driverForm" class="signup-form" style="display: none;">
+            <h2>Driver Signup</h2>
+            <form onsubmit="handleSignup(event, 'driver')" method="post">
+                <label for="driver-name">Name</label>
+                <input type="text" id="driver-name" name="name" required>
+            
+                <label for="driver-email">Email</label>
+                <input type="email" id="driver-email" name="email" required>
+
+                <label for="driver-phonenumber">phonenumber</label>
+                <input type="text" id="driver-phonenumber" name="phonenumber" required>
+            
+                <label for="driver-password">Password</label>
+                <input type="password" id="driver-password" name="password" required>
+            
+                <button type="submit">Sign Up</button>
+            </form>            
+        </div>
+    </div>
+
+    <footer>
+        <ul class="footer-links">
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Help</a></li>
+        </ul>
+        <p>&copy; 2024 Carpool Buddy. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // JavaScript for toggling the form
+        function toggleForm(role) {
+            if (role === 'rider') {
+                document.getElementById('riderForm').style.display = 'block';
+                document.getElementById('driverForm').style.display = 'none';
+            } else if (role === 'driver') {
+                document.getElementById('riderForm').style.display = 'none';
+                document.getElementById('driverForm').style.display = 'block';
+            }
+        }
+        async function handleSignup(event, role) {
+            event.preventDefault(); // Prevent default form submission behavior
+
+            // Collect form data
+            const name = document.getElementById(`${role}-name`).value;
+            const email = document.getElementById(`${role}-email`).value;
+            const phonenumber = document.getElementById(`${role}-phonenumber`).value;
+            const password = document.getElementById(`${role}-password`).value;
+
+            try {
+                const response = await fetch('http://localhost:5500/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, email, phonenumber, password, role }),
+                });
+
+                // Parse the response as JSON
+                const result = await response.json();
+
+                if (result.success) {
+                    console.log(result.success);
+                    console.log(result.message);
+                    alert(result.message); // Notify user of successful signup
+                    window.location.href = '/'; // Redirect to login page
+                } else {
+                    console.log(result.message); // Log the error message
+                    alert(result.message); // Notify user of the error
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while signing up.');
+            }
+        }
+
+    </script>
+</body>
+</html>

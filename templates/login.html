@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Carpooling Website</title>
+    <link rel="stylesheet" href="../static/loginstyle.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav>
+        <div class="logo">Carpool Buddy</div>
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Login Section -->
+        <div class="login-section">
+            <h1>Login</h1>
+            <form action="login_processor.php" method="post">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+
+                <label for="role">Select Role</label>
+                <select id="role" name="role" required>
+                    <option value="rider">Rider</option>
+                    <option value="driver">Driver</option>
+                    <option value="admin">Admin</option>
+                </select>
+
+                <button type="submit" id="login-btn">Login</button>
+            </form>
+            <p style="color: red;" id="error_message"></p>
+            <p>Don't have an account? <a href="{{ url_for('signup') }}">Sign up here</a></p>
+        </div>
+
+        <!-- Info Section -->
+        <div class="info-section">
+            <h2>Welcome to Carpool Buddy</h2>
+            <p>Join our community to share and find rides easily. Whether you're a passenger or a driver, we've got you covered!</p>
+            <img src="{{ url_for('static', filename='1000_F_234192978_AKn419FAVDl60k8LjUC4ltsfJdAAlk0l.jpg') }}" alt="Carpooling Image">
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <ul class="footer-links">
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Help</a></li>
+        </ul>
+        <p>&copy; 2024 Carpool Buddy. All rights reserved.</p>
+    </footer>
+
+
+    <script>
+        document.getElementById('login-btn').addEventListener('click', async function (e) {
+            e.preventDefault(); // Prevent form from submitting normally
+    
+            const email = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorMessage = document.getElementById('error_message');
+            const role = document.getElementById('role').value;
+    
+            // Clear previous error messages
+            errorMessage.textContent = '';
+    
+            // Validate inputs
+            if (!email || !password) {
+                errorMessage.textContent = 'Email and password are required.';
+                return;
+            }
+    
+            try {
+                const response = await fetch('http://localhost:5500/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password, role }),
+                });
+    
+                const result = await response.json();
+    
+                if (result.success) {
+                    const userId = result.user_id; // Extract user_id from the response
+                    let redirectUrl = result.redirect_url;
+
+                    // Add user_id as a query parameter if it exists
+                    if (userId) {
+                        const url = new URL(redirectUrl, window.location.origin);
+                        url.searchParams.append('user_id', userId);
+                        redirectUrl = url.toString();
+                    }
+
+                    // Redirect to the updated URL
+                    window.location.href = redirectUrl;
+                } else {
+                    errorMessage.textContent = result.message;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.textContent = 'An error occurred while logging in.';
+            }
+        });
+    </script>    
+</body>
+</html>
